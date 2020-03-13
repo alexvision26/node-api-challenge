@@ -1,6 +1,7 @@
 const router = require("express").Router();
 
 const Projects = require("../helpers/projectModel");
+const Actions = require("../helpers/actionModel");
 
 //CRUD ops
 
@@ -64,6 +65,40 @@ router.put("/:id", (req, res) => {
     .catch(err => {
       console.log(err);
       res.status(500).json({ errorMessage: "Error updating project" });
+    });
+});
+
+//Actions CRUD
+
+router.get("/:id/actions", (req, res) => {
+  const { id } = req.params;
+  Projects.getProjectActions(id)
+    .then(action => {
+      res.status(200).json(action);
+    })
+    .catch(err => {
+      console.log(err);
+      res
+        .status(500)
+        .json({ errorMessage: "Error retrieving associated actions" });
+    });
+});
+
+router.post("/:id/actions", (req, res) => {
+  const { id } = req.params;
+  const newAction = {
+    project_id: id,
+    description: req.body.description,
+    notes: req.body.notes,
+    completed: req.body.completed || false
+  };
+  Actions.insert(newAction)
+    .then(action => {
+      res.status(201).json(action);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ errorMessage: "Error creating action" });
     });
 });
 
